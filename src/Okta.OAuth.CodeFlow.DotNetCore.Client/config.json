@@ -1,0 +1,6 @@
+{
+  "Okta": {
+    "ClientId": "[Enter the clientId of your OpenID Connect application as obtained from the Okta dashbord, e.g. koKWeLLKa6WmBQJ5mYUR]",
+    "OrganizationUrl": "[Enter the name of your Okta tenant, e.g. https://acme.oktapreview.com or https://acme.okta.com]"
+  }
+}
