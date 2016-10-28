@@ -1,6 +1,7 @@
 {
   "Okta": {
     "ClientId": "koKWeLLKa6WmBQJ5mYUQ",
-    "OrganizationUrl": "https://example.oktapreview.com"
+    "OrganizationUrl": "https://example.oktapreview.com",
+    "RedirectUrl":  "http://localhost:8080"
   }
 }

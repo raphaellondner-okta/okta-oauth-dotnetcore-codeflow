@@ -1,12 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using System.Threading.Tasks;
+using System.Linq;
 
 namespace Okta.OAuth.CodeFlow.DotNetCore.Client
 {
@@ -60,13 +59,18 @@ namespace Okta.OAuth.CodeFlow.DotNetCore.Client
 
 
             //OktaDev, Configure the OWIN pipeline to use cookie auth.
-            app.UseCookieAuthentication(new CookieAuthenticationOptions());
+            app.UseCookieAuthentication(new CookieAuthenticationOptions
+            {
+                AutomaticAuthenticate = true,
+                CookieName = "MyApp",
+                AuthenticationScheme = "Cookies"
+            });
 
             //OktaDev,  Configure the OWIN pipeline to use OpenID Connect authentication.
             app.UseOpenIdConnectAuthentication(new OpenIdConnectOptions
             {
-                ClientId = Configuration["Okta:ClientId"],
                 Authority = Configuration["Okta:OrganizationUrl"],
+                ClientId = Configuration["Okta:ClientId"],
                 ResponseType = Microsoft.IdentityModel.Protocols.OpenIdConnect.OpenIdConnectResponseType.IdToken,
                 Events = new Microsoft.AspNetCore.Authentication.OpenIdConnect.OpenIdConnectEvents
                 {
