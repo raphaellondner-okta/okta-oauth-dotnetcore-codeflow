@@ -1,7 +1,9 @@
 {
   "Okta": {
     "ClientId": "koKWeLLKa6WmBQJ5mYUQ",
-    "OrganizationUrl": "https://example.oktapreview.com",
-    "RedirectUrl":  "http://localhost:8080"
+    "OrganizationUri": "https://example.oktapreview.com",
+    "RedirectUri": "http://localhost:8080/callback",
+    "ResponseType": "code id_token",
+    "Scopes": "openid profile email phone address groups offline_access"
   }
 }

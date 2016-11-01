@@ -15,7 +15,7 @@ namespace Okta.OAuth.CodeFlow.DotNetCore.Client
         {
             var builder = new ConfigurationBuilder()
                 .SetBasePath(env.ContentRootPath)
-                //OktaDev, added config.json reference and config.json file
+                //OktaDev: added config.json reference and config.json file
                 //.AddJsonFile("config.json")
                 .AddJsonFile($"config.{env.EnvironmentName}.json", optional: true)
                 .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
@@ -32,7 +32,7 @@ namespace Okta.OAuth.CodeFlow.DotNetCore.Client
             // Add framework services.
             services.AddMvc();
 
-            //OktaDev, add authentication services.
+            //OktaDev: add authentication services.
             services.AddAuthentication(sharedOptions => sharedOptions.SignInScheme = Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationDefaults.AuthenticationScheme);
 
         }
@@ -58,25 +58,45 @@ namespace Okta.OAuth.CodeFlow.DotNetCore.Client
             app.UseStaticFiles();
 
 
-            //OktaDev, Configure the OWIN pipeline to use cookie auth.
+            //OktaDev: Configure the OWIN pipeline to use cookie auth.
             app.UseCookieAuthentication(new CookieAuthenticationOptions
             {
                 AutomaticAuthenticate = true,
                 CookieName = "MyApp",
-                AuthenticationScheme = "Cookies"
+                AuthenticationScheme = "Cookies",
+                CookieSecure = Microsoft.AspNetCore.Http.CookieSecurePolicy.SameAsRequest
             });
 
-            //OktaDev,  Configure the OWIN pipeline to use OpenID Connect authentication.
-            app.UseOpenIdConnectAuthentication(new OpenIdConnectOptions
+            OpenIdConnectOptions oidcOptions = new OpenIdConnectOptions
             {
-                Authority = Configuration["Okta:OrganizationUrl"],
+                Authority = Configuration["Okta:OrganizationUri"],
                 ClientId = Configuration["Okta:ClientId"],
-                ResponseType = Microsoft.IdentityModel.Protocols.OpenIdConnect.OpenIdConnectResponseType.IdToken,
+                //OktaDev: you can include the response type using Microsoft's library constants 
+                //ResponseType = Microsoft.IdentityModel.Protocols.OpenIdConnect.OpenIdConnectResponseType.CodeIdToken,
+                ResponseType = Configuration["Okta:ResponseType"],
+                AuthenticationScheme = "oidc",
+                CallbackPath = "callback", //OktaDev: The forward slash is implied. Note that if we don't set this value manually, the callback path is by default /signin-oidc
+
+                //RefreshOnIssuerKeyNotFound is enabled by default and takes care of key rollover so no need to configure it here (Okta does perform key rollover unless configured otherwise)
+
                 Events = new Microsoft.AspNetCore.Authentication.OpenIdConnect.OpenIdConnectEvents
                 {
                     OnRemoteFailure = OnAuthenticationFailed,
-                }
-            });
+                },
+                
+                
+            };
+
+            //OktaDev: add the OIDC default scopes + the custom Okta "groups" scope (that returns the user's groups filtered or not depending on your Okta OIDC client configuration)
+            oidcOptions.Scope.Add(Microsoft.IdentityModel.Protocols.OpenIdConnect.OpenIdConnectScope.OpenIdProfile);
+            oidcOptions.Scope.Add("email");
+            oidcOptions.Scope.Add("phone");
+            oidcOptions.Scope.Add("address");
+            oidcOptions.Scope.Add("groups");
+            oidcOptions.Scope.Add("offline_access");
+
+            //OktaDev:  Configure the OWIN pipeline to use OpenID Connect authentication.
+            app.UseOpenIdConnectAuthentication(oidcOptions);
 
 
             app.UseMvc(routes =>
@@ -87,7 +107,7 @@ namespace Okta.OAuth.CodeFlow.DotNetCore.Client
             });
         }
 
-        // OktaDev, Handle sign-in errors differently than generic errors.
+        // OktaDev: Handle sign-in errors differently than generic errors.
         private Task OnAuthenticationFailed(Microsoft.AspNetCore.Authentication.FailureContext context)
         {
             context.HandleResponse();
