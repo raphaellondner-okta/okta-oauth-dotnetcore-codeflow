@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Http.Authentication;
@@ -18,7 +15,7 @@ namespace Okta.OAuth.CodeFlow.DotNetCore.Client.Controllers
         public async Task Login()
         {
             if (HttpContext.User == null || !HttpContext.User.Identity.IsAuthenticated)
-                await HttpContext.Authentication.ChallengeAsync(OpenIdConnectDefaults.AuthenticationScheme, new AuthenticationProperties { RedirectUri = "/" });
+                await HttpContext.Authentication.ChallengeAsync(OpenIdConnectDefaults.AuthenticationScheme, new AuthenticationProperties { RedirectUri = "/callback" });
         }
 
         // GET: /Account/LogOff
