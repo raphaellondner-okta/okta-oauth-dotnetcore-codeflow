@@ -1,6 +1,8 @@
 {
-  "Okta": {
+  "Okta": 
+  {
     "ClientId": "koKWeLLKa6WmBQJ5mYUQ",
+    "ClientSecret": "EZJRIrrUwzw4iOXgSzoQ6Bx8F6p8EY3hx5ntLsSk",
     "OrganizationUri": "https://example.oktapreview.com",
     "RedirectUri": "http://localhost:8080/callback",
     "ResponseType": "code id_token",

@@ -1,14 +1,13 @@
 ﻿
+using IdentityModel.Client;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using System.Threading.Tasks;
-using System.Linq;
-using IdentityModel.Client;
 using System;
 using System.Security.Claims;
+using System.Threading.Tasks;
 
 namespace Okta.OAuth.CodeFlow.DotNetCore.Client
 {
@@ -31,6 +30,11 @@ namespace Okta.OAuth.CodeFlow.DotNetCore.Client
                 .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true)
                 .AddEnvironmentVariables();
             Configuration = builder.Build();
+
+            oidcClientId = Configuration["Okta:ClientId"] as string;
+            oidcClientSecret = Configuration["Okta:ClientSecret"] as string;
+            oidcAuthority = Configuration["Okta:OrganizationUri"] as string;
+
         }
 
         public IConfigurationRoot Configuration { get; }
@@ -74,11 +78,11 @@ namespace Okta.OAuth.CodeFlow.DotNetCore.Client
                 AuthenticationScheme = "Cookies",
             });
 
-            string oidcClientId = Configuration["Okta:ClientId"] as string;
-            string oidcClientSecret = Configuration["Okta:ClientSecret"] as string;
-            string oidcAuthority = Configuration["Okta:OrganizationUri"] as string;
-            string oidcRedirectUri = Configuration["Okta:RedirectUri"] as string;
-            string oidcResponseType = Configuration["Okta:ResponseType"] as string;
+            oidcClientId = Configuration["Okta:ClientId"] as string;
+            oidcClientSecret = Configuration["Okta:ClientSecret"] as string;
+            oidcAuthority = Configuration["Okta:OrganizationUri"] as string;
+            oidcRedirectUri = Configuration["Okta:RedirectUri"] as string;
+            oidcResponseType = Configuration["Okta:ResponseType"] as string;
 
 
 
@@ -108,8 +112,8 @@ namespace Okta.OAuth.CodeFlow.DotNetCore.Client
                 },
 
 
-                
-                
+
+
             };
 
             //OktaDev: add the OIDC default scopes + the custom Okta "groups" scope (that returns the user's groups filtered or not depending on your Okta OIDC client configuration)
@@ -132,7 +136,7 @@ namespace Okta.OAuth.CodeFlow.DotNetCore.Client
             });
         }
 
-        // OktaDev: Handle code exchange with Okta. We must override this event because the Microsoft.AspNetCore.Authentication.OpenIdConnect middleware uses only the client_post_method to handle authentication with the Token endpoint while 
+        // OktaDev: Handle code exchange with Okta. We must override this event because the Microsoft.AspNetCore.Authentication.OpenIdConnect middleware uses only the client_post_method to handle authentication with the Token endpoint while exchanging the code for the access token
         private Task OnAuthenticationFailed(Microsoft.AspNetCore.Authentication.FailureContext context)
         {
             context.HandleResponse();
@@ -176,8 +180,15 @@ namespace Okta.OAuth.CodeFlow.DotNetCore.Client
 
             id.AddClaim(new Claim("expires_at", DateTime.Now.AddSeconds(tokenResponse.Result.ExpiresIn).ToLocalTime().ToString()));
 
-            //n.AuthenticationTicket = new Microsoft.AspNetCore.Authentication.AuthenticationTicket(new ClaimsIdentity(id.Claims, n.AuthenticationTicket.Identity.AuthenticationType),
-            //    n.AuthenticationTicket.Properties);
+            //ctx.Ticket = new Microsoft.AspNetCore.Authentication.AuthenticationTicket(new ClaimsPrincipal(new ClaimsIdentity(id.Claims, ctx.Ticket.Principal.Identity.AuthenticationType)),
+            //    ctx.Ticket.Properties, ctx.Ticket.AuthenticationScheme);
+
+            //Tells the OWIN middleware we retrieved the tokens on our own code, so that it doesn't try it on its own
+            ctx.HandleCodeRedemption(new Microsoft.IdentityModel.Protocols.OpenIdConnect.OpenIdConnectMessage()
+            {
+                IdToken = ctx.JwtSecurityToken.RawData,
+                AccessToken = tokenResponse.Result.AccessToken
+            });
 
             //context.HandleResponse();
             //context.Response.Redirect("/Home/Error?message=" + context.Failure.Message);

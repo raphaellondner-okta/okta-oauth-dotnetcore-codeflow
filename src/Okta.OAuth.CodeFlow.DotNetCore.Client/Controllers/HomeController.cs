@@ -27,10 +27,10 @@ namespace Okta.OAuth.CodeFlow.DotNetCore.Client.Controllers
             return View();
         }
 
-        public IActionResult Error()
-        {
-            return View();
-        }
+        //public IActionResult Error()
+        //{
+        //    return View();
+        //}
 
         //OktaDev, added redirect to error page with message
         public IActionResult Error(string message)

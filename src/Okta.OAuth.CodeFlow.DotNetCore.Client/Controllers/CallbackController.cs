@@ -11,14 +11,14 @@ namespace Okta.OAuth.CodeFlow.DotNetCore.Client.Controllers
     public class CallbackController : Controller
     {
         // GET: /<controller>/
-        //public IActionResult Index()
-        //{
-        //    return View();
-        //}
-
-        public string Index()
+        public IActionResult Index()
         {
-            return "This is the callback page - TBI";
+            return View();
         }
+
+        //public string Index()
+        //{
+        //    return "This is the callback page - TBI";
+        //}
     }
 }
