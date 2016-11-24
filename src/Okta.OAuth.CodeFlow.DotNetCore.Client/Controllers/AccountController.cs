@@ -15,7 +15,7 @@ namespace Okta.OAuth.CodeFlow.DotNetCore.Client.Controllers
         public async Task Login()
         {
             if (HttpContext.User == null || !HttpContext.User.Identity.IsAuthenticated)
-                await HttpContext.Authentication.ChallengeAsync(OpenIdConnectDefaults.AuthenticationScheme, new AuthenticationProperties { RedirectUri = "/callback" });
+                await HttpContext.Authentication.ChallengeAsync(OpenIdConnectDefaults.AuthenticationScheme, new AuthenticationProperties { RedirectUri = "/Callback" });
         }
 
         // GET: /Account/LogOff

@@ -1,11 +1,13 @@
 {
-  "Okta": 
-  {
-    "ClientId": "koKWeLLKa6WmBQJ5mYUQ",
-    "ClientSecret": "EZJRIrrUwzw4iOXgSzoQ6Bx8F6p8EY3hx5ntLsSk",
+  "Okta": {
+    //"ClientId": "koKWeLLKa6WmBQJ5mYUQ",
+    //"ClientSecret": "EZJRIrrUwzw4iOXgSzoQ6Bx8F6p8EY3hx5ntLsSk",
+    "ClientId": "tdVnAD4KaNR8O1bqUIr6",
+    "ClientSecret": "bl0yMqyBb18BC1sK3A5q5ZxoLNS7FBFxQZpwOcch",
     "OrganizationUri": "https://example.oktapreview.com",
-    "RedirectUri": "http://localhost:8080/callback",
+    "RedirectUri": "http://localhost:8080/Callback",
     "ResponseType": "code id_token",
-    "Scopes": "openid profile email phone address groups offline_access"
+    "Scopes": "openid profile email phone address groups offline_access",
+    "TokenEndPointBasicAuth": "false"
   }
 }
